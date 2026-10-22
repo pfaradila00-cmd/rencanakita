@@ -180,13 +180,15 @@
 <div class="auth-screen" id="authScreen">
   <div class="auth-card">
     <div class="auth-brand"><div class="auth-mark">♡</div><div><strong style="font-size:17px">Rencana Kita</strong><div style="font-size:11px;color:var(--muted)">Ruang bersama Ghazy & Putri</div></div></div>
-    <h1>Selamat datang kembali</h1>
-    <p>Login untuk membuka rencana liburan bersama. Akun dibuat terlebih dahulu melalui dashboard Netlify.</p>
+    <h1 id="authTitle">Selamat datang kembali</h1>
+    <p id="authDescription">Login untuk membuka rencana liburan bersama.</p>
     <form id="loginForm">
       <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" required placeholder="email kamu"></div>
-      <div class="field"><label for="loginPassword">Kata sandi</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Kata sandi" minlength="8"></div>
+      <div class="field"><label for="loginPassword">Kata sandi</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Minimal 8 karakter" minlength="8"></div>
+      <div class="field" id="confirmPasswordField" style="display:none"><label for="confirmPassword">Ulangi kata sandi</label><input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Ulangi kata sandi" minlength="8"></div>
       <button class="btn" id="loginSubmit" type="submit">Login ke Rencana Kita</button>
-      <div class="auth-message" id="authMessage" role="status"></div>
+      <button class="btn secondary" id="toggleSignup" type="button" style="width:100%;margin-top:10px">Belum punya akun? Daftar</button>
+      <div class="auth-message" id="authMessage" role="status" aria-live="polite"></div>
     </form>
   </div>
 </div>
