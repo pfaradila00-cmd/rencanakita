@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS shared_app_state (
+  id TEXT PRIMARY KEY,
+  payload JSONB NOT NULL,
+  revision INTEGER NOT NULL DEFAULT 1,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
