@@ -13,7 +13,7 @@ Tampilan dan fitur multi-rencana dari aplikasi Rencana Kita dipertahankan. Versi
 
 1. Ekstrak ZIP ini dan unggah folder proyek ke repositori GitHub.
 2. Di Netlify, pilih **Add new project → Import an existing project** lalu hubungkan repositori tersebut.
-3. Pastikan build command `npm run build`, publish directory `dist`, Node.js 22.
+3. Konfigurasi `netlify.toml` di akar repositori menetapkan base directory `rencana-kita-netlify`, build command `npm run build`, publish directory `dist`, dan Node.js 22. Direktori function dan migration berada di dalam base directory tersebut.
 4. Di Netlify project, buka **Data & Storage → Database** lalu buat database jika belum otomatis dibuat. Deploy menjalankan migration `netlify/database/migrations/0001_create_shared_app_state.sql`.
 5. Buka **Project configuration → Identity** dan aktifkan Netlify Identity. Atur pendaftaran menjadi **Invite only**.
 6. Di Identity → Users, undang dua email yang akan digunakan oleh Ghazy dan Putri. Mereka akan menerima email untuk menyelesaikan pembuatan akun.
