@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#edf1e8">
+  <meta name="description" content="Aplikasi budgeting liburan bersama pasangan. Atur anggaran, tabungan, itinerary, dan transaksi dalam satu dashboard.">
+  <title>Rencana Kita — Budgeting Liburan</title>
+  <style>
+    :root{
+      --bg:#f7f5ef;--surface:#fffefa;--surface-2:#edf1e8;--sage:#71866b;--sage-dark:#405842;
+      --sage-light:#dce6d6;--coral:#d98270;--coral-light:#f7e4de;--ink:#29372d;--muted:#788078;
+      --line:#e6e6dc;--gold:#c7a66a;--shadow:0 12px 35px rgba(45,62,46,.07);--radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;line-height:1.5}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .app.auth-hidden{display:none}
+    .auth-screen{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top right,#e4eadc,transparent 38%),var(--bg)}
+    .auth-card{width:min(430px,100%);background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:30px;box-shadow:var(--shadow)}
+    .auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}.auth-mark{height:48px;width:48px;border-radius:16px;background:var(--sage-dark);display:grid;place-items:center;color:white;font-size:23px}.auth-card h1{font-size:27px;margin:0 0 8px}.auth-card p{font-size:13px;color:var(--muted);margin:0 0 20px}.auth-card .field{margin-bottom:14px}.auth-card .btn{width:100%;margin-top:8px}.auth-message{font-size:12px;color:#9c5a4a;margin-top:12px;min-height:18px}
+    .app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh;max-width:1600px;margin:0 auto}
+    .sidebar{background:#f0f2e9;border-right:1px solid #e3e7dc;padding:28px 18px;display:flex;flex-direction:column;gap:28px}
+    .brand{display:flex;align-items:center;gap:11px;padding:0 8px}
+    .brand-mark{width:42px;height:42px;border-radius:15px;background:var(--sage-dark);color:#fff;display:grid;place-items:center;font-size:21px;box-shadow:0 7px 16px #40584230}
+    .brand-name{font-weight:800;letter-spacing:-.5px;font-size:17px}
+    .brand-sub{font-size:11px;color:var(--muted);margin-top:1px}
+    .nav-label{font-size:10px;letter-spacing:1.5px;font-weight:800;color:#9aa095;padding:0 12px;margin:0 0 8px}
+    .nav{display:grid;gap:5px}
+    .nav button{border:0;background:transparent;text-align:left;padding:12px 13px;border-radius:13px;color:#687368;display:flex;align-items:center;gap:12px;font-weight:650;transition:.2s}
+    .nav button:hover{background:#e4e9df;color:var(--sage-dark)}
+    .nav button.active{background:var(--sage-dark);color:#fff;box-shadow:0 7px 15px #40584220}
+    .nav-icon{width:20px;text-align:center;font-size:17px}
+    .side-trip{margin-top:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px}
+    .trip-art{height:74px;border-radius:13px;background:linear-gradient(140deg,#dfe9d8,#f5e2d5);display:grid;place-items:center;font-size:34px;margin-bottom:13px}
+    .side-trip strong{display:block;font-size:13px}
+    .side-trip p{margin:4px 0 12px;font-size:11px;color:var(--muted)}
+    .mini-progress{height:6px;background:#e8e9df;border-radius:9px;overflow:hidden}
+    .mini-progress span{display:block;height:100%;background:var(--coral);border-radius:9px;width:42%}
+    .side-foot{font-size:10px;color:#9aa095;text-align:center}
+    main{padding:28px clamp(18px,3vw,42px) 48px;min-width:0}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:27px}
+    .eyebrow{font-size:11px;color:var(--sage);font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+    h1{font-size:clamp(24px,2.6vw,33px);letter-spacing:-1.2px;line-height:1.15;margin:5px 0 0}
+    .top-actions{display:flex;align-items:center;gap:10px}
+    .date-chip,.profile{display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--surface);border-radius:13px;padding:10px 12px;color:#667064;font-size:12px}
+    .avatar-pair{display:flex;align-items:center;padding-left:5px}
+    .avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--surface);font-size:12px;font-weight:800;margin-left:-5px}
+    .avatar.a{background:#dce6d6;color:#405842}.avatar.b{background:#f3d8ce;color:#9c5a4a}
+    .profile span{font-weight:700;color:var(--ink)}
+    .mobile-menu{display:none}
+    .welcome{position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:20px;background:var(--sage-dark);color:#fff;border-radius:var(--radius);padding:25px 29px;margin-bottom:20px;min-height:152px}
+    .welcome:after{content:"";position:absolute;width:230px;height:230px;border:1px solid #ffffff1c;border-radius:50%;right:8%;top:-115px;box-shadow:0 0 0 25px #ffffff08,0 0 0 52px #ffffff06}
+    .welcome-copy{position:relative;z-index:1;max-width:570px}
+    .welcome .tag{display:inline-flex;align-items:center;gap:7px;background:#ffffff18;border:1px solid #ffffff20;padding:5px 9px;border-radius:30px;font-size:10px;letter-spacing:.5px;margin-bottom:9px}
+    .welcome h2{font-size:clamp(19px,2vw,25px);margin:0 0 6px;letter-spacing:-.5px}
+    .welcome p{margin:0;color:#d7e0d4;font-size:12px}
+    .welcome-meta{display:flex;gap:17px;margin-top:16px;flex-wrap:wrap;color:#e4ebe0;font-size:11px}
+    .welcome-meta span{display:flex;gap:6px;align-items:center}
+    .welcome-illustration{position:relative;z-index:1;font-size:58px;min-width:110px;text-align:center;filter:drop-shadow(0 8px 12px #172b1b44)}
+    .section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:25px 0 13px}
+    .section-heading h2{font-size:16px;margin:0;letter-spacing:-.3px}
+    .section-heading p{font-size:11px;color:var(--muted);margin:3px 0 0}
+    .link-btn{background:transparent;border:0;color:var(--sage-dark);font-size:12px;font-weight:750;padding:8px 0}
+    .btn{border:0;border-radius:12px;padding:11px 15px;background:var(--sage-dark);color:white;font-size:12px;font-weight:750;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.2s}
+    .btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+    .btn.secondary{background:var(--surface);color:var(--sage-dark);border:1px solid var(--line)}
+    .btn.coral{background:var(--coral);color:#fff}
+    .btn.small{padding:8px 11px;font-size:11px}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}
+    .stat{padding:17px 18px}
+    .stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+    .stat-label{font-size:11px;color:var(--muted);font-weight:650}
+    .stat-icon{height:34px;width:34px;display:grid;place-items:center;border-radius:11px;background:var(--surface-2);font-size:16px}
+    .stat-icon.coral{background:var(--coral-light)}
+    .stat-value{font-size:clamp(17px,1.7vw,23px);font-weight:850;letter-spacing:-.8px;white-space:nowrap}
+    .stat-note{font-size:10px;color:var(--muted);margin-top:7px}
+    .positive{color:var(--sage-dark);font-weight:750}.coral-text{color:#bd6d5d;font-weight:750}
+    .content-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.85fr);gap:16px;margin-top:17px}
+    .panel{padding:20px}
+    .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:18px}
+    .panel-head h3{font-size:14px;margin:0}
+    .panel-head p{font-size:11px;color:var(--muted);margin:4px 0 0}
+    .select{border:1px solid var(--line);background:#fffefa;color:var(--muted);border-radius:10px;padding:7px 9px;font-size:10px;max-width:130px}
+    .budget-summary{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:17px}
+    .budget-summary .big{font-size:25px;letter-spacing:-1px;font-weight:850}
+    .budget-summary small{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+    .chart-area{display:grid;grid-template-columns:150px minmax(0,1fr);align-items:center;gap:22px}
+    .donut-wrap{width:145px;height:145px;position:relative;margin:auto}
+    .donut{width:100%;height:100%;border-radius:50%;background:conic-gradient(var(--sage) 0 28%,var(--coral) 28% 47%,#d6bd8c 47% 63%,#b8c8ae 63% 78%,#e8e7dc 78% 100%);position:relative;transform:rotate(-90deg)}
+    .donut:after{content:"";position:absolute;inset:20px;border-radius:50%;background:var(--surface)}
+    .donut-center{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;flex-direction:column}
+    .donut-center strong{font-size:22px;letter-spacing:-1px}.donut-center span{font-size:10px;color:var(--muted)}
+    .legend{display:grid;gap:13px}
+    .legend-row{display:grid;grid-template-columns:9px minmax(0,1fr) auto;gap:9px;align-items:center;font-size:11px}
+    .legend-dot{width:8px;height:8px;border-radius:3px}
+    .legend-name{color:#687168;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .legend-value{font-weight:750;font-size:11px}
+    .legend-row small{display:block;font-size:9px;color:#a0a49a;margin-top:1px}
+    .savings-card{background:#f1f3e9;border:1px solid #e3e8da;border-radius:17px;padding:16px;margin-bottom:15px}
+    .savings-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .savings-head span{font-size:11px;color:#657163}
+    .savings-head strong{font-size:15px}
+    .savings-track{height:8px;background:#dce2d5;border-radius:20px;margin:13px 0 9px;overflow:hidden}
+    .savings-track span{height:100%;display:block;width:65%;background:var(--sage);border-radius:20px;transition:width .3s}
+    .savings-meta{display:flex;justify-content:space-between;gap:8px;color:#778074;font-size:10px}
+    .people{display:grid;gap:13px}
+    .person-row{display:flex;align-items:center;gap:11px}
+    .person-avatar{height:38px;width:38px;border-radius:14px;display:grid;place-items:center;font-size:12px;font-weight:850;flex-shrink:0}
+    .person-avatar.a{background:#dce6d6;color:#405842}.person-avatar.b{background:#f7e4de;color:#a95e4e}
+    .person-info{flex:1;min-width:0}
+    .person-info strong{font-size:12px;display:block}
+    .person-info span{font-size:10px;color:var(--muted)}
+    .person-amount{text-align:right;font-size:12px;font-weight:800}
+    .person-amount small{display:block;color:var(--muted);font-weight:500;font-size:10px}
+    .contribution-note{margin-top:15px;padding:11px 12px;border-radius:12px;background:#faf2ed;color:#9c6b5d;font-size:10px;display:flex;gap:8px}
+    .lower-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;margin-top:16px}
+    .itinerary-list{display:grid;gap:0}
+    .itinerary-item{display:grid;grid-template-columns:49px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0e9}
+    .itinerary-item:last-child{border-bottom:0;padding-bottom:0}
+    .day-box{background:#f0f2e9;border-radius:12px;text-align:center;padding:7px 3px;color:var(--sage-dark)}
+    .day-box strong{font-size:15px;display:block;line-height:1.2}
+    .day-box span{font-size:9px;text-transform:uppercase;font-weight:750}
+    .itin-title{font-size:12px;font-weight:800;margin-bottom:3px}
+    .itin-sub{font-size:10px;color:var(--muted)}
+    .itin-cost{text-align:right;font-size:11px;font-weight:800;white-space:nowrap}
+    .status{display:inline-block;font-size:9px;padding:4px 7px;border-radius:20px;background:#e6efe1;color:#4e6c4c;margin-top:5px}
+    .status.pending{background:#fbefdc;color:#9b7b3d}
+    .transaction-list{display:grid}
+    .transaction{display:grid;grid-template-columns:37px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #f0f0e9}
+    .transaction:last-child{border-bottom:0}
+    .tx-icon{width:36px;height:36px;border-radius:12px;background:#f0f2e9;display:grid;place-items:center;font-size:16px}
+    .tx-title{font-size:11px;font-weight:800}
+    .tx-meta{font-size:9px;color:var(--muted);margin-top:3px}
+    .tx-amount{text-align:right;font-size:11px;font-weight:850;white-space:nowrap}
+    .tx-amount small{display:block;color:var(--muted);font-size:9px;font-weight:500;margin-top:3px}
+    .tx-empty{padding:24px;text-align:center;color:var(--muted);font-size:12px}
+    .footer{margin-top:24px;display:flex;justify-content:space-between;gap:10px;color:#9a9f94;font-size:10px}
+    .page{display:none}.page.active{display:block}
+    .page-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 20px}
+    .page-title h2{font-size:23px;margin:0;letter-spacing:-.7px}.page-title p{margin:4px 0 0;color:var(--muted);font-size:12px}
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:560px}
+    th,td{text-align:left;padding:13px 12px;border-bottom:1px solid #f0f0e9;font-size:11px}
+    th{font-size:10px;color:var(--muted);font-weight:750;background:#fafaf5}
+    td{color:#485449}
+    .pill{display:inline-block;border-radius:20px;padding:4px 8px;background:#e7efe2;color:#4e6c4c;font-size:9px}
+    .pill.pending{background:#fbefdc;color:#9b7b3d}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+    .field{display:grid;gap:6px}.field.full{grid-column:1/-1}
+    .field label{font-size:11px;font-weight:750;color:#647064}
+    .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fffefa;padding:11px 12px;border-radius:11px;outline:none;color:var(--ink)}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sage);box-shadow:0 0 0 3px #71866b1a}
+    .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}
+    .modal-backdrop{position:fixed;inset:0;background:#17251dcc;z-index:20;display:none;align-items:center;justify-content:center;padding:18px}
+    .modal-backdrop.open{display:flex}
+    .modal{background:var(--surface);border-radius:22px;width:min(520px,100%);max-height:90vh;overflow:auto;padding:23px;box-shadow:0 25px 80px #15201945}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:19px}
+    .modal-head h3{margin:0;font-size:17px}
+    .close-btn{border:0;background:#f0f2e9;border-radius:10px;width:34px;height:34px;font-size:18px;color:var(--sage-dark)}
+    .toast{position:fixed;right:20px;bottom:20px;z-index:30;background:var(--sage-dark);color:white;border-radius:13px;padding:12px 16px;font-size:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .plan-manager{margin:0 0 18px}.plan-manager .panel-head{align-items:flex-start}.plan-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:12px}.plan-card{border:1px solid var(--line);border-radius:15px;padding:14px;background:var(--surface);min-width:0}.plan-card.current{border-color:var(--sage);box-shadow:0 0 0 2px #71866b1c}.plan-card.archived{opacity:.78;background:var(--surface-2,var(--surface))}.plan-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.plan-card h4{font-size:14px;margin:0 0 5px;overflow-wrap:anywhere}.plan-card p{font-size:11px;color:var(--muted);margin:0 0 12px}.plan-tag{font-size:9px;border-radius:999px;padding:4px 7px;background:#e8eee3;color:#4e6c4c;white-space:nowrap}.plan-tag.archived-tag{background:#efede7;color:#77766d}.plan-card-stats{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted);margin-bottom:12px}.plan-actions{display:flex;gap:6px;flex-wrap:wrap}.plan-actions .btn{font-size:10px;padding:7px 9px}.plan-empty{padding:18px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:12px}.plan-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:16px 0 9px}.plan-current-label{font-size:10px;color:var(--sage-dark);font-weight:700;margin-bottom:5px}
+    @media(max-width:1120px){.app{grid-template-columns:210px minmax(0,1fr)}.sidebar{padding:24px 13px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.content-grid{grid-template-columns:1fr}.lower-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:760px){
+      .app{display:block}.sidebar{position:fixed;z-index:15;left:0;top:0;bottom:0;width:260px;transform:translateX(-105%);transition:transform .25s;box-shadow:15px 0 40px #1d2b1c1a}.sidebar.open{transform:translateX(0)}
+      main{padding:19px 15px 90px}.topbar{margin-bottom:20px;align-items:flex-start}.mobile-menu{display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);height:39px;width:39px;border-radius:12px;font-size:18px;flex-shrink:0}
+      .topbar-left{display:flex;gap:10px;align-items:flex-start}.top-actions{gap:6px}.date-chip{display:none}.profile{padding:5px 8px;border:0;background:transparent}.profile>span{display:none}.avatar{height:27px;width:27px}
+      .welcome{padding:21px;min-height:0;align-items:flex-start}.welcome-illustration{font-size:42px;min-width:50px;margin-top:15px}.welcome-meta{gap:10px}.stats{gap:10px}.stat{padding:14px}.stat-value{font-size:18px}.stat-top{margin-bottom:10px}.stat-icon{width:30px;height:30px}
+      .content-grid,.lower-grid{grid-template-columns:minmax(0,1fr);gap:12px;margin-top:12px}.panel{padding:16px}.chart-area{grid-template-columns:125px minmax(0,1fr);gap:14px}.donut-wrap{width:120px;height:120px}.donut:after{inset:17px}.donut-center strong{font-size:19px}.legend{gap:10px}.section-heading{margin-top:21px}.footer{flex-direction:column}
+      .page-title{align-items:flex-start;flex-direction:column}.page-title h2{font-size:21px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}
+    }
+    @media(max-width:390px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat-value{font-size:16px}.welcome-illustration{display:none}.chart-area{grid-template-columns:1fr}.donut-wrap{width:135px;height:135px}.legend{grid-template-columns:1fr 1fr}.legend-row{grid-template-columns:8px minmax(0,1fr);gap:6px}.legend-value{grid-column:2}.legend-name{white-space:normal}}
+  </style>
+</head>
+<body>
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-brand"><div class="auth-mark">♡</div><div><strong style="font-size:17px">Rencana Kita</strong><div style="font-size:11px;color:var(--muted)">Ruang bersama Ghazy & Putri</div></div></div>
+    <h1>Selamat datang kembali</h1>
+    <p>Login untuk membuka rencana liburan bersama. Akun dibuat terlebih dahulu melalui dashboard Netlify.</p>
+    <form id="loginForm">
+      <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" required placeholder="email kamu"></div>
+      <div class="field"><label for="loginPassword">Kata sandi</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Kata sandi" minlength="8"></div>
+      <button class="btn" id="loginSubmit" type="submit">Login ke Rencana Kita</button>
+      <div class="auth-message" id="authMessage" role="status"></div>
+    </form>
+  </div>
+</div>
+<div class="app auth-hidden" id="appShell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">♡</div><div><div class="brand-name">Rencana Kita</div><div class="brand-sub">Plan the trip, share the joy</div></div></div>
+    <div><div class="nav-label">MENU UTAMA</div><nav class="nav" aria-label="Menu utama">
+      <button class="active" data-page="dashboard"><span class="nav-icon">▦</span> Dashboard</button>
+      <button data-page="budget"><span class="nav-icon">◉</span> Anggaran</button>
+      <button data-page="savings"><span class="nav-icon">♡</span> Tabungan Bersama</button>
+      <button data-page="itinerary"><span class="nav-icon">▣</span> Itinerary</button>
+      <button data-page="transactions"><span class="nav-icon">↗</span> Transaksi</button>
+    </nav></div>
+    <div class="side-trip"><div class="trip-art">🏕️</div><strong id="sideTripName">Little Escape to Bandung</strong><p id="sideTripDate">12–14 Desember 2026 · 3 hari</p><div class="mini-progress"><span id="sideProgress"></span></div><p style="margin:9px 0 0" id="sideProgressText">42% menuju target tabungan</p></div>
+    <div class="side-foot">Dibuat dengan ♡ untuk cerita kalian</div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <div class="topbar-left"><button class="mobile-menu" id="menuToggle" aria-label="Buka menu">☰</button><div><div class="eyebrow" id="todayLabel">RABU, 21 OKTOBER 2026</div><h1 id="pageHeading">Halo, lovebirds! ♡</h1></div></div>
+      <div class="top-actions"><div class="date-chip">◷ <span id="dateRange">12–14 Desember 2026</span></div><button class="btn secondary small" id="logoutBtn" type="button">Keluar</button><div class="profile"><div class="avatar-pair"><div class="avatar a">A</div><div class="avatar b">B</div></div><span>Ghazy & Putri</span></div></div>
+    </header>
+
+    <section class="page active" id="page-dashboard">
+      <div class="welcome">
+        <div class="welcome-copy"><div class="tag">✦ OUR NEXT ADVENTURE</div><h2 id="heroTripName">Little Escape to Bandung</h2><p id="heroTripDescription">Waktunya istirahat sejenak, membuat kenangan baru, dan menikmati waktu berdua.</p><div class="welcome-meta"><span>♧ <span id="heroTripDates">12–14 Desember 2026</span></span><span>♡ 2 orang</span><span>◷ 3 hari 2 malam</span></div></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px"><div class="welcome-illustration" aria-hidden="true">🌿</div><button class="btn secondary small" id="editTripBtn">✎ Edit rencana</button></div>
+      </div>
+      <section class="card panel plan-manager"><div class="panel-head"><div><h3>Rencana liburan kalian</h3><p>Setiap rencana memiliki anggaran, tabungan, transaksi, dan itinerary masing-masing.</p></div><button class="btn" id="addPlanBtn">＋ Tambah rencana</button></div><div id="planManagerList" class="plan-list"></div></section>
+      <div class="stats">
+        <div class="card stat"><div class="stat-top"><span class="stat-label">Total Anggaran</span><span class="stat-icon">◉</span></div><div class="stat-value" id="statBudget">Rp 3.500.000</div><div class="stat-note">Batas dana perjalanan</div></div>
+        <div class="card stat"><div class="stat-top"><span class="stat-label">Pengeluaran Aktual</span><span class="stat-icon coral">↗</span></div><div class="stat-value" id="statSpent">Rp 1.245.000</div><div class="stat-note" id="spentNote"><span class="positive">35,6%</span> dari anggaran</div></div>
+        <div class="card stat"><div class="stat-top"><span class="stat-label">Sisa Anggaran</span><span class="stat-icon">✧</span></div><div class="stat-value" id="statRemaining">Rp 2.255.000</div><div class="stat-note">Tetap sesuai rencana, ya!</div></div>
+        <div class="card stat"><div class="stat-top"><span class="stat-label">Tabungan Terkumpul</span><span class="stat-icon coral">♡</span></div><div class="stat-value" id="statSavings">Rp 1.450.000</div><div class="stat-note" id="savingsNote">41,4% dari target dana</div></div>
+      </div>
+      <div class="section-heading"><div><h2>Gambaran keuangan</h2><p>Semua rencana kalian, dalam satu tempat.</p></div><button class="btn small" id="quickAdd">＋ Catat transaksi</button></div>
+      <div class="content-grid">
+        <div class="card panel">
+          <div class="panel-head"><div><h3>Rincian anggaran</h3><p>Estimasi dibanding pengeluaran aktual</p></div><select class="select" id="budgetFilter" aria-label="Filter kategori"><option value="all">Semua kategori</option><option value="Transportasi">Transportasi</option><option value="Penginapan">Penginapan</option><option value="Konsumsi">Konsumsi</option><option value="Aktivitas">Aktivitas</option><option value="Lainnya">Lainnya</option></select></div>
+          <div class="budget-summary"><div><div class="big" id="budgetSpentBig">Rp 1.245.000</div><small>Sudah digunakan dari total anggaran</small></div><div style="text-align:right"><div class="positive" id="budgetPercent">35,6%</div><small>terpakai</small></div></div>
+          <div class="chart-area"><div class="donut-wrap"><div class="donut" id="budgetDonut"></div><div class="donut-center"><strong id="donutPercent">36%</strong><span>terpakai</span></div></div><div class="legend" id="budgetLegend"></div></div>
+        </div>
+        <div class="card panel">
+          <div class="panel-head"><div><h3>Tabungan berdua ♡</h3><p>Langkah kecil menuju liburan impian</p></div><button class="link-btn" data-goto="savings">Kelola →</button></div>
+          <div class="savings-card"><div class="savings-head"><span>Target dana liburan</span><strong id="savingsTotal">Rp 3.500.000</strong></div><div class="savings-track"><span id="savingsBar"></span></div><div class="savings-meta"><span id="savingsCollected">Terkumpul Rp 1.450.000</span><span id="savingsPct">41,4%</span></div></div>
+          <div class="people" id="contributionPeople"></div>
+          <div class="contribution-note"><span>♡</span><span>Komunikasikan nominal kontribusi yang nyaman untuk kalian berdua. Yang penting, tetap transparan dan saling sepakat.</span></div>
+        </div>
+      </div>
+      <div class="lower-grid">
+        <div class="card panel"><div class="panel-head"><div><h3>Agenda perjalanan</h3><p>Rencana aktivitas yang sudah disusun</p></div><button class="link-btn" data-goto="itinerary">Lihat semua →</button></div><div class="itinerary-list" id="dashboardItinerary"></div></div>
+        <div class="card panel"><div class="panel-head"><div><h3>Transaksi terbaru</h3><p>Catatan pengeluaran terakhir</p></div><button class="link-btn" data-goto="transactions">Lihat semua →</button></div><div class="transaction-list" id="dashboardTransactions"></div></div>
+      </div>
+      <div class="footer"><span>© 2026 Rencana Kita · Keuangan bersama, kenangan selamanya.</span><span>Data tersimpan di browser perangkat ini.</span></div>
+    </section>
+
+    <section class="page" id="page-budget">
+      <div class="page-title"><div><h2>Anggaran perjalanan</h2><p>Atur batas biaya dan pantau realisasinya.</p></div><button class="btn" id="addBudgetBtn">＋ Tambah anggaran</button></div>
+      <div class="stats" style="margin-bottom:17px"><div class="card stat"><div class="stat-label">Total Anggaran</div><div class="stat-value" id="budgetPageTotal">Rp 3.500.000</div></div><div class="card stat"><div class="stat-label">Realisasi</div><div class="stat-value" id="budgetPageSpent">Rp 1.245.000</div></div><div class="card stat"><div class="stat-label">Sisa Anggaran</div><div class="stat-value" id="budgetPageRemaining">Rp 2.255.000</div></div><div class="card stat"><div class="stat-label">Kategori</div><div class="stat-value" id="budgetCategoryCount">5 kategori</div></div></div>
+      <div class="card panel"><div class="panel-head"><div><h3>Daftar anggaran per kategori</h3><p>Estimasi dan realisasi biaya perjalanan.</p></div></div><div class="table-wrap"><table><thead><tr><th>KATEGORI</th><th>BATAS ANGGARAN</th><th>AKTUAL</th><th>SISA</th><th>STATUS</th><th>AKSI</th></tr></thead><tbody id="budgetTable"></tbody></table></div></div>
+    </section>
+
+    <section class="page" id="page-savings">
+      <div class="page-title"><div><h2>Tabungan bersama ♡</h2><p>Bangun dana liburan dengan target yang realistis.</p></div><button class="btn coral" id="addSavingsBtn">＋ Catat setoran</button></div>
+      <div class="card panel" style="margin-bottom:16px"><div class="panel-head"><div><h3>Progres target tabungan</h3><p>Target dan kontribusi gabungan kalian.</p></div></div><div class="budget-summary"><div><div class="big" id="savingsPageCollected">Rp 1.450.000</div><small>Jumlah dana yang terkumpul</small></div><div style="text-align:right"><div class="positive" id="savingsPagePercent">41,4%</div><small>dari target</small></div></div><div class="savings-track" style="height:12px"><span id="savingsPageBar"></span></div><div class="savings-meta"><span id="savingsPageTarget">Target Rp 3.500.000</span><span id="savingsPageGap">Kurang Rp 2.050.000</span></div></div>
+      <div class="card panel"><div class="panel-head"><div><h3>Kontribusi per orang</h3><p>Edit target dan nominal tabungan masing-masing secara langsung.</p></div></div><div class="people" id="savingsPeople"></div><div style="margin-top:18px"><button class="btn secondary" id="editContributions">Edit kontribusi per orang</button></div></div>
+    </section>
+
+    <section class="page" id="page-itinerary">
+      <div class="page-title"><div><h2>Itinerary perjalanan</h2><p>Susun agenda dan estimasi biaya tiap aktivitas.</p></div><button class="btn" id="addItineraryBtn">＋ Tambah agenda</button></div>
+      <div class="card panel"><div class="panel-head"><div><h3>Rencana kegiatan</h3><p>Jadwal bisa disesuaikan kapan saja.</p></div></div><div class="itinerary-list" id="fullItinerary"></div></div>
+    </section>
+
+    <section class="page" id="page-transactions">
+      <div class="page-title"><div><h2>Transaksi</h2><p>Semua pengeluaran tercatat dengan rapi.</p></div><button class="btn" id="addTransactionBtn">＋ Catat transaksi</button></div>
+      <div class="stats" style="margin-bottom:17px"><div class="card stat"><div class="stat-label">Total transaksi</div><div class="stat-value" id="txCount">0</div></div><div class="card stat"><div class="stat-label">Total pengeluaran</div><div class="stat-value" id="txTotal">Rp 0</div></div></div>
+      <div class="card panel"><div class="panel-head"><div><h3>Riwayat transaksi</h3><p>Pengeluaran yang telah dicatat untuk perjalanan ini.</p></div><button class="btn secondary small" id="exportCsv">↓ Ekspor CSV</button></div><div class="table-wrap"><table><thead><tr><th>TANGGAL</th><th>TRANSAKSI</th><th>KATEGORI</th><th>DIBAYAR OLEH</th><th>NOMINAL</th><th></th></tr></thead><tbody id="transactionsTable"></tbody></table></div></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal"><div class="modal-head"><h3 id="modalTitle">Tambah data</h3><button class="close-btn" id="closeModal" aria-label="Tutup">×</button></div><div id="modalContent"></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
